@@ -143,6 +143,7 @@ func NewServer(opts ...Option) (*LdapSvc, error) {
 			s.l.BindFunc("", h)
 			s.l.SearchFunc("", h)
 			s.l.CloseFunc("", h)
+			s.l.CompareFunc("", h)
 		}
 		allHandlers.Handlers[i] = h
 		backendCounter++

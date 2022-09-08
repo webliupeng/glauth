@@ -6,8 +6,8 @@
 
 PLUGIN_OS ?= linux
 PLUGIN_ARCH ?= amd64
-
-plugins: plugin_mysql plugin_postgres plugin_sqlite
+#plugins: plugin_mysql plugin_postgres plugin_sqlite
+plugins: plugin_mysql
 
 plugin_mysql: bin/$(PLUGIN_OS)$(PLUGIN_ARCH)/mysql.so
 

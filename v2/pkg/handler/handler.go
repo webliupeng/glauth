@@ -22,6 +22,8 @@ type Handler interface {
 	ldap.Modifier // Note: modifying eg the uid or cn might change the dn because the hierarchy is determined by the backend
 	ldap.Deleter
 
+	ldap.Comparer
+
 	// helper
 	HelperMaker
 }

@@ -26,7 +26,7 @@ func (b MysqlBackend) GetPrepareSymbol() string {
 
 // Create db/schema if necessary
 func (b MysqlBackend) CreateSchema(db *sql.DB) {
-	statement, _ := db.Prepare(`
+	statement, err := db.Prepare(`
 CREATE TABLE IF NOT EXISTS users (
 	id INTEGER AUTO_INCREMENT PRIMARY KEY,
 	name VARCHAR(64) NOT NULL,
@@ -43,8 +43,12 @@ CREATE TABLE IF NOT EXISTS users (
 	passbcrypt VARCHAR(64) DEFAULT '',
 	otpsecret VARCHAR(64) DEFAULT '',
 	yubikey VARCHAR(128) DEFAULT '',
-	custattr TEXT DEFAULT '{}')
+	custattr TEXT )
 `)
+
+	if err != nil {
+		panic(err)
+	}
 	statement.Exec()
 	statement, _ = db.Prepare("CREATE UNIQUE INDEX idx_user_name on users(name)")
 	statement.Exec()

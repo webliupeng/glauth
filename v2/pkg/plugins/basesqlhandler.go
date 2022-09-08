@@ -122,6 +122,62 @@ func (h databaseHandler) Delete(boundDN string, deleteDN string, conn net.Conn) 
 	return ldap.LDAPResultInsufficientAccessRights, nil
 }
 
+func (h databaseHandler) Compare(boundDN string, req ldap.CompareRequest, conn net.Conn) (ldap.LDAPResultCode, error) {
+	h.log.V(2).Info("Compare", "Request DN", req.DN, "req ava", req.Ava)
+
+	var err error
+	h.MemGroups, err = h.memoizeGroups()
+	if err != nil {
+		return ldap.LDAPResultOperationsError, err
+	}
+
+	if len(req.Ava) == 0 {
+		return ldap.LDAPResultInvalidAttributeSyntax, nil
+	}
+
+	if req.Ava[0].AttributeDesc == "memberUid" && req.Ava[0].AssertionValue != "" {
+		groupid := 0
+		err := h.database.cnx.QueryRow(fmt.Sprintf(`SELECT u.primarygroup FROM users u WHERE uidnumber=%s`, req.Ava[0].AssertionValue)).Scan(&groupid)
+
+		if err != nil {
+			return ldap.LDAPResultOperationsError, err
+		}
+		name := h.getGroupName(groupid)
+
+		if name == "" {
+			return ldap.LDAPResultNoSuchObject, nil
+		}
+
+		if strings.Contains(req.DN, fmt.Sprintf(`ou=%s`, name)) {
+			return ldap.LDAPResultCompareTrue, nil
+		} else {
+			return ldap.LDAPResultCompareFalse, nil
+		}
+	} else if req.Ava[0].AttributeDesc == "gidNumber" && req.Ava[0].AssertionValue != "" {
+		gid, err := strconv.ParseInt(req.Ava[0].AssertionValue, 10, 64)
+
+		if err != nil {
+			return ldap.LDAPResultOperationsError, err
+		}
+		name := h.getGroupName(int(gid))
+
+		if name == "" {
+			return ldap.LDAPResultNoSuchObject, nil
+		}
+
+		if strings.Contains(req.DN, fmt.Sprintf(`ou=%s`, name)) {
+			fmt.Println(req.DN, "contains", fmt.Sprintf(`ou=%s`, name), true)
+			return ldap.LDAPResultCompareTrue, nil
+		} else {
+			fmt.Println(req.DN, "contains", fmt.Sprintf(`ou=%s`, name), false)
+
+			return ldap.LDAPResultCompareFalse, nil
+		}
+
+	}
+	return ldap.LDAPResultInsufficientAccessRights, nil
+}
+
 func (h databaseHandler) FindUser(userName string, searchByUPN bool) (f bool, u config.User, err error) {
 	var criterion string
 	if searchByUPN {

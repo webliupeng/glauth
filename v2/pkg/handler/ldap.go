@@ -88,6 +88,10 @@ func NewLdapHandler(opts ...Option) Handler {
 	return handler
 }
 
+func (h ldapHandler) Compare(boundDN string, req ldap.CompareRequest, conn net.Conn) (ldap.LDAPResultCode, error) {
+	return ldap.LDAPResultInsufficientAccessRights, nil
+}
+
 //
 func (h ldapHandler) Bind(bindDN, bindSimplePw string, conn net.Conn) (resultCode ldap.LDAPResultCode, err error) {
 	h.log.V(6).Info("Bind request", "binddn", bindDN, "src", conn.RemoteAddr())

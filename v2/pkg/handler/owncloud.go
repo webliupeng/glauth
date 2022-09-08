@@ -38,6 +38,10 @@ type ownCloudHandler struct {
 // global lock for ownCloudHandler sessions & servers manipulation
 var ownCloudLock sync.Mutex
 
+func (h ownCloudHandler) Compare(boundDN string, req ldap.CompareRequest, conn net.Conn) (ldap.LDAPResultCode, error) {
+	return ldap.LDAPResultInsufficientAccessRights, nil
+}
+
 func (h ownCloudHandler) Bind(bindDN, bindSimplePw string, conn net.Conn) (ldap.LDAPResultCode, error) {
 	bindDN = strings.ToLower(bindDN)
 	baseDN := strings.ToLower("," + h.backend.BaseDN)

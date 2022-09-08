@@ -76,6 +76,10 @@ func (h configHandler) Delete(boundDN string, deleteDN string, conn net.Conn) (r
 	return ldap.LDAPResultInsufficientAccessRights, nil
 }
 
+func (h configHandler) Compare(boundDN string, req ldap.CompareRequest, conn net.Conn) (ldap.LDAPResultCode, error) {
+	return ldap.LDAPResultInsufficientAccessRights, nil
+}
+
 func (h configHandler) FindUser(userName string, searchByUPN bool) (f bool, u config.User, err error) {
 	user := config.User{}
 	found := false

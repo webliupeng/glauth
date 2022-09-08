@@ -27,3 +27,5 @@ require (
 	gopkg.in/amz.v3 v3.0.0-20201001071545-24fc1eceb27b
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 )
+
+replace github.com/nmcclain/ldap => github.com/webliupeng/ldap v0.0.0-20220906093220-126dbe1bce48
